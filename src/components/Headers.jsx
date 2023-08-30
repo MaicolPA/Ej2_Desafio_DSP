@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import './headers.css';
+
 
 export const Header = ({
     allProducts,
@@ -18,6 +20,25 @@ export const Header = ({
             setTotal(total - product.price * product.quantity);
             setCountProducts(countProducts - product.quantity);
             setAllProducts(results);
+        };
+
+        const updateProductQuantity = (productId, quantity) => {
+            // Validar si la cantidad es un número y es mayor que 0
+            if (isNaN(quantity) || quantity < 1) return;
+        
+            const updatedProducts = allProducts.map(product =>
+                product.id === productId
+                ? { ...product, quantity: quantity }
+                : product
+            );
+            
+            // Actualizar el total y countProducts
+            const newTotal = updatedProducts.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
+            const newCount = updatedProducts.reduce((acc, curr) => acc + curr.quantity, 0);
+            
+            setAllProducts(updatedProducts);
+            setTotal(newTotal);
+            setCountProducts(newCount);
         };
     
         const onCleanCart = () => {
@@ -48,21 +69,6 @@ export const Header = ({
                             <>
                                 <div className='row-product'>
                                     {allProducts.map(product => (
-                                        // <div className='cart-product' key={product.id}>
-                                        //     <div className='info-cart-product'>
-                                        //         <div className='imagen-producto-carrito'>
-                                        //         <img src={product.urlImage} alt={product.title} className="icon-product" />
-                                        //         </div>
-                                        //         <div className='titulo-producto-carrito'>
-                                        //             <p>{product.title}</p>
-                                        //         </div>
-                                        //         <div className='cold'>
-                                        //             a
-                                        //         </div>
-                                        //         </div>
-                                        //             <img src="https://static.vecteezy.com/system/resources/previews/018/887/462/original/signs-close-icon-png.png" alt="cerrar" className="icon-close" onClick={() => onDeleteProduct(product)}/>
-                                        //         </div>
-
                                         <div className='parent'>
                                             <div class="imagen-producto-carrito"> 
                                                 <img src={product.urlImage} alt={product.title} className="icon-product" />
@@ -75,7 +81,12 @@ export const Header = ({
                                             </div>
                                             <div class="precio-producto-carrito">
                                                 <form action="#">
-                                                    <input type="number" className='contador'/>
+                                                    <input 
+                                                        type="number"
+                                                        className='contador'
+                                                        value={product.quantity}
+                                                        onChange={(e) => updateProductQuantity(product.id, Number(e.target.value))}
+                                                    />
                                                 </form>
                                             </div>
                                             <div class="delete-producto-carrito">
